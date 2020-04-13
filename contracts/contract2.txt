@@ -1,0 +1,7 @@
+PARTY Purchaser HAS AMOUNT 1000
+PARTY Supplier HAS AMOUNT 5000
+PARTY Supplier OWES PARTY Purchaser SERVICE product_delivery
+SERVICE product_delivery INCLUDES TERM 10
+SERVICE product_delivery INCLUDES PROPERTY quality_confirmed
+SERVICE product_delivery INCLUDES PROPERTY fully_loaded
+PARTY Purchaser OWES PARTY Supplier AMOUNT 200 WHEN EVENT product_delivery
