@@ -28,6 +28,11 @@ public class MainPanel extends JPanel {
         editPanel.add(new JTextField(str));
     }
 
+    public void repaintEditField() {
+        editPanel.validate();
+        editPanel.repaint();
+    }
+
     public String getContractText() {
         return textArea.getText();
     }
@@ -35,4 +40,11 @@ public class MainPanel extends JPanel {
     public void enableTextArea(Boolean isEnabled) {
         textArea.setEditable(isEnabled);
     }
+
+    public void clearEditPanel() { editPanel.removeAll(); }
+
+    public void setTextContract(String contractStr) { textArea.setText(contractStr); }
+
+    public String getContractStr() { return textArea.getText(); }
+
 }

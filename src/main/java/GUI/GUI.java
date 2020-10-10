@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
@@ -54,13 +55,54 @@ public class GUI extends JFrame {
 
         add(rightPanel);
 
-        addButton("Запуск", "Контракт", "Запустить контракт", true, "/resources/run.png", () -> {
-            model.runContract(mainPanel.getContractText());
-            mainPanel.enableTextArea(false);
+        addButton("Перевести", "Контракт", "Перевести текст контракта", true, "/translate.png", () -> {
+            mainPanel.clearEditPanel();
+            model.generateText(mainPanel.getContractText());
+            mainPanel.enableTextArea(true);
+            mainPanel.repaintEditField();
         });
 
-        addButton("Стоп", "Контракт", "Завершить исполнение контракта", true, "/resources/pause.png", () -> {
+        addButton("Запуск", "Контракт", "Запустить контракт", true, "/run.png", () -> {
+            model.runContract(mainPanel.getContractText());
+            mainPanel.enableTextArea(false);
+
+            buttonMap.get("Запуск").setEnabled(false);
+            menuItemMap.get("Запуск").setEnabled(false);
+            buttonMap.get("Стоп").setEnabled(true);
+            menuItemMap.get("Стоп").setEnabled(true);
+        });
+
+        addButton("Стоп", "Контракт", "Завершить исполнение контракта", true, "/pause.png", () -> {
             model.stopContract();
+            buttonMap.get("Стоп").setEnabled(false);
+            menuItemMap.get("Стоп").setEnabled(false);
+            buttonMap.get("Запуск").setEnabled(true);
+            menuItemMap.get("Запуск").setEnabled(true);
+        });
+
+        buttonMap.get("Стоп").setEnabled(false);
+        menuItemMap.get("Стоп").setEnabled(false);
+
+        toolBar.addSeparator();
+
+        addButton("Сохранить", "Файл", "Сохранить контракт", true, "/save.png", () -> {
+            JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir") + "/contracts/");
+            fileChooser.setDialogTitle("Save state");
+            int f = fileChooser.showSaveDialog(GUI.this);
+            if (f == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                model.saveContract(file.getAbsolutePath(), mainPanel.getContractStr());
+            }
+        });
+
+        addButton("Загрузить", "Файл", "Загрузить контракт", true, "/load.png", () -> {
+            JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir") + "/contracts/");
+            fileChooser.setDialogTitle("Загрузить контракт");
+            int f = fileChooser.showOpenDialog(GUI.this);
+            if (f == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                model.loadContract(file.getAbsolutePath());
+            }
         });
 
         add(toolBar, BorderLayout.NORTH);
@@ -173,4 +215,6 @@ public class GUI extends JFrame {
     public void addEditField(String str) {
         mainPanel.addTextField(str);
     }
+
+    public void setTextContract(String contractStr) { mainPanel.setTextContract(contractStr); }
 }

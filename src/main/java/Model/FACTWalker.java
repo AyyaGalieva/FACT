@@ -25,11 +25,6 @@ public class FACTWalker extends FACTBaseListener {
         try {
             Integer amount = Integer.parseInt(ctx.getChild(2).getChild(1).getText());
             parties.add(new Party(name, amount));
-            model.addText("Сторона ");
-            model.addEditField(name);
-            model.addText(" обладает активом в ");
-            model.addEditField(amount.toString());
-            model.addText(" единиц. ");
         } catch (Exception e) {
             errorMessage = "AMOUNT must be integer";
         }
@@ -64,13 +59,6 @@ public class FACTWalker extends FACTBaseListener {
             subject.setService(service);
             subjects.add(subject);
             createObligationEventTask(debtor, creditor, subject.getService());
-            model.addText("Сторона ");
-            model.addEditField(debtorName);
-            model.addText(" обязуется оказать сервис ");
-            model.addEditField(service);
-            model.addText(" стороне ");
-            model.addEditField(creditorName);
-            model.addText(". ");
             return;
         }
 
@@ -82,16 +70,6 @@ public class FACTWalker extends FACTBaseListener {
             term = Integer.parseInt(ctx.getChild(6).getChild(1).getChild(1).getText());
         } else {
             eventName = ctx.getChild(6).getChild(1).getChild(1).getText();
-
-            model.addText("Сторона ");
-            model.addEditField(debtorName);
-            model.addText(" обязуется выплатить ");
-            model.addEditField("" + subject.getAmount());
-            model.addText(" единиц стороне ");
-            model.addEditField(creditorName);
-            model.addText(", при свершении ");
-            model.addEditField(eventName);
-            model.addText(". ");
 
             Boolean eventNameIsValid = false;
             for (Subject s : subjects) {
@@ -117,13 +95,6 @@ public class FACTWalker extends FACTBaseListener {
             System.err.println("Party has not been init.");
         } else if (term > 0) {
             obligationTimerTasks.add(new ObligationTimerTask(model, debtor, creditor, subject, term));
-            model.addText("Сторона ");
-            model.addEditField(debtorName);
-            model.addText(" обязуется выплатить ");
-            model.addEditField(""+subject.getAmount());
-            model.addText(" единиц, по истечении срока ");
-            model.addEditField(""+term);
-            model.addText(". ");
         }
     }
 
@@ -144,19 +115,9 @@ public class FACTWalker extends FACTBaseListener {
         if (serviceConstituentType.equals(ServiceConstituent.TERM.toString())) {
             int term = Integer.parseInt(ctx.getChild(2).getChild(1).getText());
             service.setTerm(term);
-            model.addText("Сервис ");
-            model.addEditField(serviceName);
-            model.addText(" обязан быть предоставлен в срок, ограниченный ");
-            model.addEditField(""+term);
-            model.addText(". ");
         } else if (serviceConstituentType.equals(ServiceConstituent.PROPERTY.toString())) {
             String property = ctx.getChild(2).getChild(1).getText();
             service.addProperty(property);
-            model.addText("Сервис ");
-            model.addEditField(serviceName);
-            model.addText( " включает в себя соблюдения требования ");
-            model.addEditField(property);
-            model.addText(". ");
         }
     }
 

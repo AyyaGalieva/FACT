@@ -12,11 +12,16 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.*;
+import java.util.List;
+import java.util.Timer;
 
 public class Model {
     private static final String connectionUrl = "jdbc:sqlserver://localhost:5555;database=FactDB;integratedSecurity=true;";
@@ -71,6 +76,23 @@ public class Model {
         view.addEvent(service.getServiceName(), properties, () -> {
             startEvent(service.getServiceName(), properties, service.getTerm());
         });
+    }
+
+    public void generateText(String contract) {
+        FACTLexer lexer = new FACTLexer(CharStreams.fromString(contract));
+        CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+        FACTParser parser = new FACTParser(tokenStream);
+
+        ParseTree tree = parser.contract();
+        ParseTreeWalker walker = new ParseTreeWalker();
+        TextGenerator textGenerator = new TextGenerator();
+        textGenerator.setModel(this);
+        walker.walk(textGenerator, tree);
+
+        if (!textGenerator.getErrorMessage().equals("")) {
+            view.showContractIncorrect(textGenerator.getErrorMessage());
+            return;
+        }
     }
 
     public void runContract(String contract) {
@@ -158,6 +180,30 @@ public class Model {
             view.clearData();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void loadContract(String path) {
+        try {
+            Scanner in = new Scanner(new File(path));
+            String contractStr = "";
+            while (in.hasNext()) {
+                contractStr += in.nextLine() + "\n";
+            }
+            view.setTextContract(contractStr);
+
+        } catch (FileNotFoundException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    public void saveContract(String path, String contractStr) {
+        try {
+            PrintWriter out = new PrintWriter(new File(path));
+            out.printf(contractStr);
+            out.close();
+        } catch (FileNotFoundException e) {
+            System.err.println(e.getMessage());
         }
     }
 
